@@ -15,7 +15,7 @@ public class PreferencesUtils {
     private static XSharedPreferences getInstance() {
         if (instance == null) {
             instance = new XSharedPreferences(PreferencesUtils.class.getPackage().getName());
-            instance.makeWorldReadable();
+//            instance.makeWorldReadable();//这里会有安全问题，导致hook失败，暂时没找到方法
         } else {
             instance.reload();
         }
