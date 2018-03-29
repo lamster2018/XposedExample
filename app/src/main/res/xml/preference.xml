@@ -1,0 +1,14 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="步数设置">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="open"
+            android:title="开关" />
+        <EditTextPreference
+            android:dependency="open"
+            android:hint="500倍以上有风险"
+            android:inputType="phone"
+            android:key="ratio"
+            android:title="倍数" />
+    </PreferenceCategory>
+</PreferenceScreen>

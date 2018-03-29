@@ -27,10 +27,13 @@ import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 public class Main implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
-        if (loadPackageParam.packageName.contains("com.tencent.mm")) {
-            hookBushuByHookALL(loadPackageParam);
+        if (loadPackageParam.packageName.contains("com.tencent")) {
+            XposedBridge.log("fck--open----" + PreferencesUtils.isOpen());
+            if (PreferencesUtils.isOpen()) {
+//            hookBushuByHookALL(loadPackageParam);
 //            hookBushuByFindAndHook(loadPackageParam);
 //            hookMenu(loadPackageParam);
+            }
         }
     }
 
@@ -56,10 +59,10 @@ public class Main implements IXposedHookLoadPackage {
                             int sensorType = sensor.getType();
                             if (sensorType == 19 || sensorType == 18) {
                                 //500倍差不多了
-                                float step = ((float[]) param.args[1])[0] * 5;
+                                float step = ((float[]) param.args[1])[0] * PreferencesUtils.getRatio();
                                 XposedBridge.log("fck---" + loadPackageParam.packageName
-                                        + " 传感器类型 " + sensorType
                                         + " 当前步数 " + ((float[]) param.args[1])[0]
+                                        + " 倍数 " + PreferencesUtils.getRatio()
                                         + " 修改 " + step);
                                 ((float[]) param.args[1])[0] = step;
                             }
@@ -97,10 +100,10 @@ public class Main implements IXposedHookLoadPackage {
                         int sensorType = sensor.getType();
                         if (sensorType == 19 || sensorType == 18) {
                             //500倍差不多了
-                            float step = ((float[]) param.args[1])[0] * 500;
+                            float step = ((float[]) param.args[1])[0] * PreferencesUtils.getRatio();
                             XposedBridge.log("fck---" + loadPackageParam.packageName
-                                    + " 传感器类型 " + sensorType
                                     + " 当前步数 " + ((float[]) param.args[1])[0]
+                                    + " 倍数 " + PreferencesUtils.getRatio()
                                     + " 修改 " + step);
                             ((float[]) param.args[1])[0] = step;
                         }

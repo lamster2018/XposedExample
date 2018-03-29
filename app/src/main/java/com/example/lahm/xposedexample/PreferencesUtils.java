@@ -21,12 +21,12 @@ public class PreferencesUtils {
         return instance;
     }
 
-    public static boolean open() {
-        return getInstance().getBoolean("open", false);
+    public static boolean isOpen() {
+        return getInstance().getBoolean("open", true);
     }
 
-    public static String notContains() {
-        return getInstance().getString("not_contains", "").replace("，", ",");
+    public static int getRatio() {
+        return Integer.parseInt(getInstance().getString("ratio", "").replace("，", ","));
     }
 
 }
