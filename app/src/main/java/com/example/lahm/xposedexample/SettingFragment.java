@@ -24,6 +24,7 @@ public class SettingFragment extends PreferenceFragment implements
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //这里的安全问题也会导致hook失败
         getPreferenceManager().setSharedPreferencesMode(Context.MODE_PRIVATE);
         getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
         addPreferencesFromResource(R.xml.preference);

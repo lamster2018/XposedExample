@@ -49,12 +49,13 @@ public class Main implements IXposedHookLoadPackage {
                                     return;
                                 }
                                 int sensorType = sensor.getType();
+                                XposedBridge.log("fucku---传感器不为NULL， 传感器类型 " + sensorType);
                                 if (sensorType == 19 || sensorType == 18) {
                                     //500倍差不多了
                                     float step = ((float[]) param.args[1])[0] * 101;
                                     XposedBridge.log("fucku---" + loadPackageParam.packageName
-                                            + " 传感器类型 " + sensorType
                                             + " 当前步数 " + ((float[]) param.args[1])[0]
+//                                            + " 倍数 " + PreferencesUtils.getRatio()
                                             + " 修改 " + step);
                                     ((float[]) param.args[1])[0] = step;
                                 }

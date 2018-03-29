@@ -11,6 +11,7 @@ import de.robv.android.xposed.XSharedPreferences;
 public class PreferencesUtils {
     private static XSharedPreferences instance = null;
 
+    //加上这个XSP就不能修改成功，这里应该有bug
     private static XSharedPreferences getInstance() {
         if (instance == null) {
             instance = new XSharedPreferences(PreferencesUtils.class.getPackage().getName());
