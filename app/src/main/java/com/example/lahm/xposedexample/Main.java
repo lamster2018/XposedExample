@@ -29,7 +29,7 @@ import static de.robv.android.xposed.XposedHelpers.findClass;
 public class Main implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
-        if (loadPackageParam.packageName.contains("com.tencent")) {
+        if (loadPackageParam.packageName.contains("com.tencent.mm")) {
             try {
                 XposedBridge.hookAllMethods(
                         findClass("android.hardware.SystemSensorManager$SensorEventQueue",
