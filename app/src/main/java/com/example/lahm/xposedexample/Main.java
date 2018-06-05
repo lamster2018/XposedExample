@@ -31,43 +31,53 @@ public class Main implements IXposedHookLoadPackage {
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
         if (loadPackageParam.packageName.contains("com.tencent.mm")) {
             try {
-                XposedBridge.hookAllMethods(
-                        findClass("android.hardware.SystemSensorManager$SensorEventQueue",
-                                loadPackageParam.classLoader),
-                        "dispatchSensorEvent",
-                        new XC_MethodHook() {
-                            @Override
-                            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                                super.beforeHookedMethod(param);
-                                int intValue = ((Integer) param.args[0]).intValue();
-                                Field declaredField = param.thisObject.getClass().getDeclaredField("mSensorsEvents");
-                                declaredField.setAccessible(true);
-                                Sensor sensor = ((SensorEvent)
-                                        ((SparseArray) declaredField.get(param.thisObject)).get(intValue)).sensor;
-                                if (sensor == null) {
-                                    XposedBridge.log("fucku---传感器为NULL");
-                                    return;
-                                }
-                                int sensorType = sensor.getType();
-                                XposedBridge.log("fucku---传感器不为NULL， 传感器类型 " + sensorType);
-                                if (sensorType == 19 || sensorType == 18) {
-                                    //500倍差不多了
-                                    float step = ((float[]) param.args[1])[0] * 101;
-                                    XposedBridge.log("fucku---" + loadPackageParam.packageName
-                                            + " 当前步数 " + ((float[]) param.args[1])[0]
-//                                            + " 倍数 " + PreferencesUtils.getRatio()
-                                            + " 修改 " + step);
-                                    ((float[]) param.args[1])[0] = step;
-                                }
-                            }
-                        });
+                hookBushuByFindAndHook(loadPackageParam);
             } catch (Exception e) {
-                XposedBridge.log("fucku--caonimashabi");
+                log("exception");
             }
         }
     }
 
-    //这里遇到传入数组的问题https://bbs.pediy.com/thread-202147.htm
+    private void log(String msg) {
+        XposedBridge.log("lahm--" + msg);
+    }
+
+    private void hookBushuByHookAll(final XC_LoadPackage.LoadPackageParam loadPackageParam) {
+        XposedBridge.hookAllMethods(
+                findClass("android.hardware.SystemSensorManager$SensorEventQueue",
+                        loadPackageParam.classLoader),
+                "dispatchSensorEvent",
+                new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+                        int intValue = ((Integer) param.args[0]).intValue();
+                        Field declaredField = param.thisObject.getClass().getDeclaredField("mSensorsEvents");
+                        declaredField.setAccessible(true);
+                        Sensor sensor = ((SensorEvent)
+                                ((SparseArray) declaredField.get(param.thisObject)).get(intValue)).sensor;
+                        int sensorType = sensor.getType();
+                        if (sensor == null) {
+                            log("传感器为NULL");
+                            return;
+                        }
+                        log("传感器不为NULL， 传感器类型 " + sensorType);
+                        if (sensorType == 19 || sensorType == 18) {
+                            //500倍差不多了
+                            float step = ((float[]) param.args[1])[0] * 101;
+                            log(loadPackageParam.packageName
+                                    + " 当前步数 " + ((float[]) param.args[1])[0]
+//                                            + " 倍数 " + PreferencesUtils.getRatio()
+                                    + " 修改 " + step);
+                            ((float[]) param.args[1])[0] = step;
+                        }
+                    }
+                });
+    }
+
+    //这里遇到传入数组的问题
+    // https://bbs.pediy.com/thread-202147.htm
+    // https://blog.csdn.net/cskgnt/article/details/7816212
     //传入自定义的class，先用findClass
     //如果怕麻烦，考虑用hookAll，
     private void hookBushuByFindAndHook(final XC_LoadPackage.LoadPackageParam loadPackageParam) {
@@ -75,7 +85,9 @@ public class Main implements IXposedHookLoadPackage {
                 loadPackageParam.classLoader,
                 "dispatchSensorEvent",
                 int.class,
-                Array.newInstance(float.class, 0).getClass(),
+                float[].class,//亲测可行
+//                new Class[]{float[].class},//不可行
+//                Array.newInstance(float.class, 0).getClass(),//亲测可行
                 int.class,
                 long.class,
                 new XC_MethodHook() {
@@ -88,16 +100,17 @@ public class Main implements IXposedHookLoadPackage {
                         Sensor sensor = ((SensorEvent)
                                 ((SparseArray) declaredField.get(param.thisObject)).get(intValue)).sensor;
                         if (sensor == null) {
-                            XposedBridge.log("fck---传感器为NULL");
+                            log("传感器为NULL");
                             return;
                         }
                         int sensorType = sensor.getType();
                         if (sensorType == 19 || sensorType == 18) {
                             //500倍差不多了
-                            float step = ((float[]) param.args[1])[0] * PreferencesUtils.getRatio();
-                            XposedBridge.log("fck---" + loadPackageParam.packageName
+//                            float step = ((float[]) param.args[1])[0] * PreferencesUtils.getRatio();
+                            float step = ((float[]) param.args[1])[0] * 231;
+                            log(loadPackageParam.packageName
                                     + " 当前步数 " + ((float[]) param.args[1])[0]
-                                    + " 倍数 " + PreferencesUtils.getRatio()
+//                                            + " 倍数 " + PreferencesUtils.getRatio()
                                     + " 修改 " + step);
                             ((float[]) param.args[1])[0] = step;
                         }
@@ -124,7 +137,6 @@ public class Main implements IXposedHookLoadPackage {
                             menu.getItem(i).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                                 @Override
                                 public boolean onMenuItemClick(MenuItem item) {
-                                    XposedBridge.log("fck--" + finalI);
 //                                        Toast.makeText(applicationContext, "click" + finalI, Toast.LENGTH_SHORT).show();
                                     return false;
                                 }
